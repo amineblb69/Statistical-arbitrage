@@ -1,0 +1,13 @@
+yfinance
+pandas
+numpy
+scipy
+scikit-learn
+matplotlib
+seaborn
+torch
+pyyaml
+pytest
+jupyter
+tqdm
+ibapi

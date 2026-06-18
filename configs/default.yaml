@@ -1,0 +1,44 @@
+data:
+  tickers_ch2:
+    - [WM, RSG]
+    - [UAL, DAL]
+    - [V, MA]
+    - [MS, GS]
+    - [NVDA, AMD]
+    - [CVX, XOM]
+  formation_start: "2021-01-01"
+  formation_end: "2021-12-31"
+  trading_start: "2022-01-01"
+  trading_end: "2022-12-31"
+  interval:        "1d"
+
+ou:
+  hedge_ratio_grid: [-2.0, 2.0, 0.01]   # min, max, step
+  lookback_L: 252
+
+trading:
+  K: 1.0          # entry threshold
+  M: 30           # moving average window
+  stop_loss_r: 0.1
+
+diversification:
+  rebalance_window: 63   # quarterly
+  methods: [EW, MRB, MRR, MVA]
+  method_choosed: "MRR"
+
+signature:
+  truncation_order: 3
+  threshold_k: 0.05
+  sigmoid_mu: 20
+  n_train_samples: 100
+  discount_rate: 0.01
+  transaction_cost: 0.001
+
+rl:
+  lookback_l: 4
+  threshold_k_pct: 3.0
+  learning_rate: 0.1
+  discount_factor: 0.99
+  epsilon: 0.1
+  n_episodes: 10
+  n_train_paths: 10000

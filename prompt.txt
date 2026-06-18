@@ -1,0 +1,1 @@
+Do an in-depth analysis of our live trading bot, run deep backtests, and come up with an improved strategy with better win rate, fewer losses, net of fees
