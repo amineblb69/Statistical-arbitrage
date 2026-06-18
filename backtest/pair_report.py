@@ -88,8 +88,8 @@ def generate_report(results_df, trades_df, metrics, strategy, pair_id, initial_c
         f"Total Return: {metrics['total_return_pct']:.2f}% | "
         f"Sharpe: {metrics['sharpe_ratio']:.3f} | "
         f"Max DD: {metrics['max_drawdown_pct']:.2f}% | "
-        f"Win Rate: {metrics['win_rate']:.1f}%",
-        f"Dates :"
+        f"Win Rate: {metrics['win_rate']:.1f}%"
+        f"\nDaterange : {results_df.index[0].date()} - {results_df.index[-1].date()}",
         fontsize=16, fontweight='bold', y=0.995
     )
 
