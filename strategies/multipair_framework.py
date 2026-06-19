@@ -6,8 +6,8 @@ import numpy as np
 import pandas as pd
 from typing import Dict, List, Tuple, Union
 
-import diversification as _dv_module
-import pairs_trading as pt
+import strategies.diversification as _dv_module
+import strategies.pairs_trading as pt
 from backtest.engine import BacktestEngine
 
 
