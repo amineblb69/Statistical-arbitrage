@@ -344,9 +344,7 @@ class MultiPairFramework:
 
         return pd.DataFrame(self.portfolio_log)
 
-    # ------------------------------------------------------------------
-    # 5. Accessors
-    # ------------------------------------------------------------------
+   
     def get_portfolio_curve(self) -> pd.DataFrame:
         return pd.DataFrame(self.portfolio_log)
 
