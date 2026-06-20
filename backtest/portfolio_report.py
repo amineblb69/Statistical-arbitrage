@@ -370,7 +370,7 @@ def main():
             },
             "diversification": {
                 "rebalance_window": 63,
-                "method_choosed": "EW",  # EW is the only allocator without known bugs
+                "method_choosed": "MRR",  
             },
         }
 

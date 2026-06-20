@@ -147,7 +147,11 @@ class MultiPairFramework:
             trader._entry_spread = None
             self.pair_capital[pair] = engine.capital
 
-        total_cash = sum(self.pair_capital.values())
+        if self.stage_idx == -1 :
+            total_cash = self.total_capital
+        else : 
+            total_cash = sum(self.pair_capital.values())
+
         self.running_capital = total_cash
         print(f"Total cash after liquidation: ${total_cash:,.2f}")
 
