@@ -306,9 +306,9 @@ def generate_report(results_df, trades_df, metrics, strategy, pair_id, initial_c
 def main():
     config = {
         "trading": {
-            "M": 63,
-            "K": 1.5,
-            "stop_loss_r": 0.05,
+            "M": 30,
+            "K": 1.0,
+            "stop_loss_r": 0.1,
             "slippage": 0.0005,
             "commission": 0.001,
         },
@@ -318,9 +318,9 @@ def main():
     }
 
     tickers = ["MS", "GS"]
-    formation_start = "2021-01-01"
+    formation_start = "2020-01-01"
     formation_end = "2021-12-31"
-    trading_end = "2022-12-31"
+    trading_end = "2024-12-31"
     interval = "1d"
     initial_capital = 100_000.0
 

@@ -96,6 +96,8 @@ class MultiPairFramework:
         )
         if pair not in self.price_history or self.price_history[pair].empty:
             self.price_history[pair] = row
+        elif date in self.price_history[pair].index:
+            self.price_history[pair].loc[date] = row.loc[date]           
         else:
             self.price_history[pair] = pd.concat([self.price_history[pair], row])
 

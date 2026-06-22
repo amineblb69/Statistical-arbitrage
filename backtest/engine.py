@@ -33,7 +33,7 @@ class BacktestEngine:
         self.initial_capital = initial_capital
         self.config          = config
         self.capital         = initial_capital
-        self.positions       = []
+        self.positions       = {}
         self.trade_log       = []
         self.pnl_log         = []
 

@@ -23,14 +23,14 @@ from data.loader import fetch_pair_prices
 
 class PortfolioReport:
 
-    def __init__(self, config, dict, pairs, initial_capital : float = 100_000.0):
+    def __init__(self, config, pairs, initial_capital : float = 100_000.0):
 
         self.config = config   
-        self.pairs  = [tuple(p)for p in pairs]
+        self.pairs  = [tuple(p) for p in pairs]
         self.initial_capital = initial_capital
         
         data_cfg = config.get("data",{})
-        self.formation_start = data_cfg.get("fomation_start","2022-12-31")
+        self.formation_start = data_cfg.get("formation_start","2022-12-31")
         self.formation_end   = data_cfg.get("formation_end","2023-12-31")
         self.trading_start   = data_cfg.get("trading_start","2023-12-31")
         self.trading_end     = data_cfg.get("trading_end","2025-12-31")
@@ -41,7 +41,11 @@ class PortfolioReport:
         div_cfg     = config.get("diversification",{})
 
         self.framework_config = {
-            "method": div_cfg.get("method_choosed","MRR"),
+            "ou":{
+                "hedge_ratio_grid": [0.1, 2.0, 0.01],
+                "lookback_L": 252,
+            },
+            "method": div_cfg.get("method_choosed","EW"),
             "L" : ou_cfg.get("loockback_L", 252),
             "Lr" : div_cfg.get("rebalance_windox", 63),
             "M" : trading_cfg.get("M", 63),
@@ -66,16 +70,17 @@ class PortfolioReport:
         self.pair_metrics       = None
         self.pair_contributions = None
 
-    def _load_price_data(self) -> dict :
-        
+    def _load_price_data(self) -> dict:
         price_data = {}
-
-        for pair in self.pairs :
-            price_data[pair] = fetch_pair_prices(
-                list(pair),
-                self.formation_start,
-                self.formation_end,
-                self.interval)
+        for pair in self.pairs:
+            full_df = fetch_pair_prices(
+                pair,
+                start=self.formation_start,
+                end=self.trading_end,
+                itv=self.interval,
+            )
+            full_df.columns = [f"{pair[0]}_close", f"{pair[1]}_close"]
+            price_data[pair] = full_df
 
         return price_data
     
@@ -99,6 +104,7 @@ class PortfolioReport:
         
         self.pair_daily_logs = {
             pair: pd.DataFrame(self.framework.pair_daily_logs.get(pair, []))
+            for pair in self.pairs
             }
         
         for pair in self.pairs :
@@ -127,7 +133,7 @@ class PortfolioReport:
             This comes from pair_daily_logs, not from compute_metrics().
             """
 
-            self.pair_metrics = {}
+            self.pair_metrics       = {}
             self.pair_contributions = {}
 
             for pair in self.pairs :
@@ -147,7 +153,8 @@ class PortfolioReport:
                 self.pair_metrics[pair] = compute_metrics(trades_df, results_df=None,initial_capital=ref_capital)
                 
                 daily_log = self.pair_daily_logs.get(pair, pd.DataFrame())
-                self.pair_contributions[pair] = (float(daily_log["pnl"].sum()) if not daily_log.empty() else 0.0)
+                self.pair_contributions[pair] = (
+                float(daily_log["pnl"].sum()) if not daily_log.empty else 0.0 )
 
     def print_metrics(self):
         if self.portfolio_metrics is None:
@@ -362,19 +369,19 @@ def main():
                 "lookback_L": 252,
             },
             "trading": {
-                "M": 63,
+                "M": 30,
                 "K": 1.5,
-                "stop_loss_r": 0.05,
+                "stop_loss_r": 0.075,
                 "slippage": 0.0005,
                 "commission": 0.001,
             },
             "diversification": {
                 "rebalance_window": 63,
-                "method_choosed": "MRR",  
+                "method_choosed": "MRB",  
             },
         }
 
-        pairs = [("MS","GS"),("NVDA","AMD")]
+        pairs = [["MS","GS"],["V","MA"]]
         initial_capital = 100_000.0
 
         report = PortfolioReport(config, pairs, initial_capital)
