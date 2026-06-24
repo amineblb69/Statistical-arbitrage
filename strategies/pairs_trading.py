@@ -78,12 +78,14 @@ class OUpairTrader :
         if len(history_data) < self.M :
             return 0
         
-        s1           = history_data[self._s1_col]
-        s2           = history_data[self._s2_col]
-        spread_serie = spread.construct_spread(s1,s2,self.b_ratio)
+        s1            = history_data[self._s1_col]
+        s2            = history_data[self._s2_col]
+        spread_serie  = spread.construct_spread(s1,s2,self.b_ratio)
+        spread_window = spread_serie.iloc[-self.M:]  # ← always exactly M days
 
-        ma  = spread.rolling_mean(spread_serie, self.M)
-        std = spread.rolling_std(spread_serie, self.M)
+
+        ma  = spread_window.mean()
+        std = spread_window.std()
 
         current_s   = spread_serie.iloc[-1]
         current_ma  = ma.iloc[-1]

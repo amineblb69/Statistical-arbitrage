@@ -342,16 +342,19 @@ class PortfolioReport:
             ax_corr.text(0.5, 0.5, "Need >=2 pairs\nwith data", ha='center', va='center',
                         transform=ax_corr.transAxes)
             ax_corr.set_title("Pair Return Correlation", fontsize=11, fontweight='bold')
- 
-        report_path = os.path.join(output_dir, f"{report_name}.png")
-        fig.savefig(report_path, dpi=150, bbox_inches='tight')
 
+        report_path = os.path.join(output_dir, f"{report_name}.png")
+        
         if show:
             plt.show()
         else:
             plt.close(fig)
- 
-        print(f"Portfolio report saved to: {report_path}")
+
+        save = input('Do you want the report to be saved ? (Y/N) : ').upper()
+        if save == 'Y':
+            fig.savefig(report_path, dpi=150, bbox_inches='tight')
+            print(f"Portfolio report saved to: {report_path}")
+        
         return report_path
  
 def main():
@@ -371,17 +374,17 @@ def main():
             "trading": {
                 "M": 30,
                 "K": 1.5,
-                "stop_loss_r": 0.075,
+                "stop_loss_r": 0.1,
                 "slippage": 0.0005,
                 "commission": 0.001,
             },
             "diversification": {
                 "rebalance_window": 63,
-                "method_choosed": "MRR",  
+                "method_choosed": "MRB",  
             },
         }
 
-        pairs = [["MS","GS"],["V","MA"]]
+        pairs = [["MS","GS"],["V","MA"],["UAL","DAL"],["NVDA","AMD"],["WM","RSG"],["CVX","XOM"]]
         initial_capital = 100_000.0
 
         report = PortfolioReport(config, pairs, initial_capital)
