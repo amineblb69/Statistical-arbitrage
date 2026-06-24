@@ -377,7 +377,7 @@ def main():
             },
             "diversification": {
                 "rebalance_window": 63,
-                "method_choosed": "MRB",  
+                "method_choosed": "MRR",  
             },
         }
 

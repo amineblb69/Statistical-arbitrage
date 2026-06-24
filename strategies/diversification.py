@@ -60,7 +60,7 @@ class MeanReversionBudgetingAllocator:
             s2        = pair_data[1]
         
             b_ratio, mu, theta, sigma = fit_hedge_ratio(s1, s2)
-            spread  = construct_spread(s1,s2,self.b_ratio) 
+            spread  = construct_spread(s1,s2,b_ratio) 
             ll      = compute_log_likelihood(spread,mu,theta,sigma)
             
             self.b_ratios.append(b_ratio)
