@@ -121,33 +121,36 @@ class MultiPairFramework:
             engine = self.pair_engines.get(pair)
 
             if trader is None or engine is None or trader._position == 0:
-                # Nothing open; just record whatever cash the engine already holds
                 self.pair_capital[pair] = engine.capital if engine else self.pair_capital.get(pair, 0.0)
                 continue
 
-            # Current raw prices
             hist = self.price_history[pair]
-            if date not in hist.index:
-                continue
-            s1_price = float(hist.loc[date, self.column_names[pair][0]])
-            s2_price = float(hist.loc[date, self.column_names[pair][1]])
+            s1_col, s2_col = self.column_names[pair]
+            if date in hist.index:
+                s1_price = float(hist.loc[date, s1_col])
+                s2_price = float(hist.loc[date, s2_col])
+            else:
+                s1_price = float(hist[s1_col].iloc[-1])
+                s2_price = float(hist[s2_col].iloc[-1])
 
             spread_price = trader.get_spread_price(date, hist.loc[:date])
+            if trader._position != 0 :
+                pnl = engine._execute_signal(
+                    signal=0,
+                    spread=spread_price,
+                    s1_price=s1_price,
+                    s2_price=s2_price,
+                    b_ratio=trader.b_ratio,
+                    capital=engine.capital,
+                    pair=list(pair),
+                    date=date,
+                )
+                engine.capital += pnl
 
-            pnl = engine._execute_signal(
-                signal=0,
-                spread=spread_price,
-                s1_price=s1_price,
-                s2_price=s2_price,
-                b_ratio=trader.b_ratio,
-                capital=engine.capital,
-                pair=list(pair),
-                date=date,
-            )
-            engine.capital += pnl
             trader._position = 0
             trader._entry_spread = None
-            self.pair_capital[pair] = engine.capital
+            trader._spread_sl    = None
+            self.pair_capital[pair] = engine.mark_to_market(spread_price)
 
         if self.stage_idx == -1 :
             total_cash = self.total_capital
@@ -245,18 +248,19 @@ class MultiPairFramework:
         """
         date = pd.to_datetime(date)
 
-        # --- Append prices to history ---
+        #Append Prices to the history
         for pair, (s1_p, s2_p) in bar_dict.items():
             if pair not in self.column_names:
-                # First time we see this pair — infer column names from config
-                # or default to standard names.  If you ingested history first,
-                # this block is skipped.
                 self.column_names[pair] = ("s1", "s2")
             self._append_bar(date, pair, s1_p, s2_p)
 
         # --- Stage transition check (Paper Step 8) ---
         if self.stage_idx == -1 or self.stage_day >= self.Lr:
             self._rebalance(date)
+            total_cap = sum(e.capital for e in self.pair_engines.values())
+            self.portfolio_log.append({"date":date, "capital":total_cap, "stage":self.stage_idx,"stage_day":self.stage_day})
+            self.stage_day+=1
+            return
 
         # --- Intra-stage trading per pair ---
         for pair in self.pairs:

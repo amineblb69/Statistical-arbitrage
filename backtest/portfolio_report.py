@@ -364,7 +364,7 @@ def main():
                 "formation_start": "2022-01-01",
                 "formation_end": "2022-12-31",
                 "trading_start": "2023-01-01",
-                "trading_end": "2024-12-31",
+                "trading_end": "2023-12-31",
                 "interval": "1d",
             },
             "ou": {
@@ -379,12 +379,12 @@ def main():
                 "commission": 0.001,
             },
             "diversification": {
-                "rebalance_window": 63,
+                "rebalance_window": 63, 
                 "method_choosed": "MRB",  
             },
         }
 
-        pairs = [["MS","GS"],["V","MA"],["UAL","DAL"],["NVDA","AMD"],["WM","RSG"],["CVX","XOM"]]
+        pairs = [["MS","GS"],["V","MA"],["WM","RSG"],["CVX","XOM"],["UAL","DAL"],["NVDA","AMD"]]
         initial_capital = 100_000.0
 
         report = PortfolioReport(config, pairs, initial_capital)

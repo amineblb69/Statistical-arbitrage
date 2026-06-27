@@ -147,7 +147,7 @@ class BacktestEngine:
                 'total_cost' : cost_s1 + cost_s2,
                 'net_pnl'    : net_pnl,
                 'capital'    : prev_capital + net_pnl,
-                'return'     : net_pnl / prev_capital * 100,                            
+                'return'     : net_pnl / prev_capital * 100 if prev_capital !=0 else 0.0,                            
                 })
             
             self.positions = {}
@@ -161,8 +161,8 @@ class BacktestEngine:
             s1_fill = s1_price * (1 + signal * slippage)
             s2_fill = s2_price * (1 - signal * slippage)
 
-            #   signal = +1 → qty positive → long S1, short S2
-            #   signal = -1 → qty negative → short S1, long S2
+            #signal = +1 → qty positive → long S1, short S2
+            #signal = -1 → qty negative → short S1, long S2
             qty = signal * capital / s1_fill
 
             # entry costs on both legs
@@ -171,9 +171,10 @@ class BacktestEngine:
 
             self.positions = {
                 'signal'        : signal,
-                'qty'           : qty,          # signed: + means long spread
+                'qty'           : qty,          
                 's1_entry'      : s1_fill,
                 's2_entry'      : s2_fill,
+                'entry_spread'  : spread,
                 'date'          : date,
                 'entry_cost'    : cost_s1 + cost_s2,
                 'entry_capital' : capital
@@ -182,3 +183,20 @@ class BacktestEngine:
             net_pnl -= (cost_s1 + cost_s2)
 
         return net_pnl
+    
+    def mark_to_market(self, current_spread : float) -> float :
+
+        """
+        The goal is to return the current total equity : available cash + unrealised pnl 
+        to make a good rebalance based on all the equity not only the availablecash.
+        Paper's formula : C-t + X_t * POS(X_t)
+        """
+
+        if not self.positions:
+            return self.capital
+        
+        pos          = self.positions.get('qty',0.0)
+        entry_spread = self.positions.get('entry_spread',current_spread)
+        unrealised   = (entry_spread - current_spread) * pos 
+
+        return self.capital + unrealised

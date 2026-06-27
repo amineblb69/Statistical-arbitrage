@@ -186,7 +186,7 @@ def generate_report(results_df, trades_df, metrics, strategy, pair_id, initial_c
     ax_spread.plot(spread.index, spread, color='#6A4C93', linewidth=1)
     ax_spread.axhline(y=strategy.mu, color='orange', linestyle='--',
                       label=f"mu = {strategy.mu:.2f}")
-    ax_spread.axhline(y=strategy.theta, color='red', linestyle='--',label=f'mu = {strategy.theta:.2f}')
+    ax_spread.axhline(y=strategy.theta, color='red', linestyle='--',label=f'theta = {strategy.theta:.2f}')
     ax_spread.fill_between(spread.index, spread, strategy.mu,
                            where=(spread > strategy.mu), color='green', alpha=0.1)
     ax_spread.fill_between(spread.index, spread, strategy.mu,
@@ -306,9 +306,9 @@ def generate_report(results_df, trades_df, metrics, strategy, pair_id, initial_c
 def main():
     config = {
         "trading": {
-            "M": 30,
+            "M": 63,
             "K": 1.0,
-            "stop_loss_r": 0.1,
+            "stop_loss_r": 0.01,
             "slippage": 0.0005,
             "commission": 0.001,
         },
@@ -317,10 +317,10 @@ def main():
         }
     }
 
-    tickers = ["MS", "GS"]
-    formation_start = "2020-01-01"
-    formation_end = "2021-12-31"
-    trading_end = "2024-12-31"
+    tickers = ["NVDA", "AMD"]
+    formation_start = "2015-01-01"
+    formation_end = "2016-01-01"
+    trading_end = "2026-01-01"
     interval = "1d"
     initial_capital = 100_000.0
 

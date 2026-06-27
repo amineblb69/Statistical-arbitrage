@@ -81,11 +81,10 @@ class OUpairTrader :
         s1            = history_data[self._s1_col]
         s2            = history_data[self._s2_col]
         spread_serie  = spread.construct_spread(s1,s2,self.b_ratio)
-        spread_window = spread_serie.iloc[-self.M:]  # ← always exactly M days
 
 
-        ma  = spread_window.mean()
-        std = spread_window.std()
+        ma  = spread_serie.rolling(self.M).mean()
+        std = spread_serie.rolling(self.M).std()
 
         current_s   = spread_serie.iloc[-1]
         current_ma  = ma.iloc[-1]
@@ -105,7 +104,7 @@ class OUpairTrader :
 
                 self._position     = 1
                 self._entry_spread = current_s
-                self._spread_sl    = self._entry_spread * (1 - self.r)
+                self._spread_sl    = self._entry_spread - self.r * abs(self._entry_spread)
 
                 return 1
 
@@ -113,7 +112,7 @@ class OUpairTrader :
 
                 self._position     = -1
                 self._entry_spread = current_s
-                self._spread_sl    = self._entry_spread * (1 + self.r)
+                self._spread_sl    = self._entry_spread + self.r *abs(self._entry_spread)
 
                 return -1
 
@@ -124,12 +123,14 @@ class OUpairTrader :
             if current_s > current_ma:
                 self._position    = 0
                 self._entry_spread = None
+                self._spread_sl    = None
                 return 0
 
             # stop-loss: spread fell r% below entry  
             if self._entry_spread is not None and current_s < self._spread_sl:
                 self._position    = 0
                 self._entry_spread = None
+                self._spread_sl    = None
                 return 0
 
         elif self._position == -1:
@@ -137,12 +138,14 @@ class OUpairTrader :
             if current_s < current_ma:
                 self._position    = 0
                 self._entry_spread = None
+                self._spread_sl    = None
                 return 0
 
             # stop-loss: spread rose r% above entry  
             if self._entry_spread is not None and current_s > self._spread_sl:
                 self._position    = 0
                 self._entry_spread = None
+                self._spread_sl    = None
                 return 0
         
         return self._position
