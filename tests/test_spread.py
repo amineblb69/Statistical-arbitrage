@@ -20,5 +20,5 @@ ma  = spr.rolling(M).mean()
 std = spr.rolling(M).std()
 
 print(spr)
-print("THE HEDGE RATIO CALCULATED BY OU FITTING IS : {b_r} \n WITH THE FOLLOWING PARAMS : mu({mu}), theta({theta}), sigma({sigma})")
+print(f"THE HEDGE RATIO CALCULATED BY OU FITTING IS : {b_r} \n WITH THE FOLLOWING PARAMS : mu({mu}), theta({theta}), sigma({sigma})")
 print(spread_window,ma,std)

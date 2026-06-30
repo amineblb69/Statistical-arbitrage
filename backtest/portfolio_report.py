@@ -343,6 +343,11 @@ class PortfolioReport:
                         transform=ax_corr.transAxes)
             ax_corr.set_title("Pair Return Correlation", fontsize=11, fontweight='bold')
 
+        print(25*'=')
+        print("--- PAIR DAILY LOGS ---")
+        print(25*'=')
+        print(self.portfolio_log)
+
         report_path = os.path.join(output_dir, f"{report_name}.png")
         
         if show:
@@ -354,6 +359,7 @@ class PortfolioReport:
         if save == 'Y':
             fig.savefig(report_path, dpi=150, bbox_inches='tight')
             print(f"Portfolio report saved to: {report_path}")
+        
         
         return report_path
  
@@ -373,14 +379,14 @@ def main():
             },
             "trading": {
                 "M": 30,
-                "K": 1.5,
+                "K": 1.0,
                 "stop_loss_r": 0.1,
                 "slippage": 0.0005,
                 "commission": 0.001,
             },
             "diversification": {
                 "rebalance_window": 63, 
-                "method_choosed": "MRB",  
+                "method_choosed": "EW",  
             },
         }
 
@@ -391,6 +397,7 @@ def main():
         report.run()
         report.print_metrics()
         report.generate_report(output_dir="reports")
+        
 
 if __name__ == "__main__" :
     main()

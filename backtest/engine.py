@@ -197,6 +197,6 @@ class BacktestEngine:
         
         pos          = self.positions.get('qty',0.0)
         entry_spread = self.positions.get('entry_spread',current_spread)
-        unrealised   = (entry_spread - current_spread) * pos 
+        unrealised   = (current_spread - entry_spread) * pos 
 
         return self.capital + unrealised

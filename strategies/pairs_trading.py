@@ -44,8 +44,8 @@ class OUpairTrader :
         self._s1_col = data.columns[0]
         self._s2_col = data.columns[1]
 
-        s1 = data[self._s1_col].values
-        s2 = data[self._s2_col].values
+        s1 = data[self._s1_col].values 
+        s2 = data[self._s2_col].values 
 
         b_ratio, mu, theta, sigma = ou_fitting.fit_hedge_ratio(s1, s2, self.g_min, self.g_max, self.g_step)
 
@@ -77,7 +77,7 @@ class OUpairTrader :
 
         if len(history_data) < self.M :
             return 0
-        
+
         s1            = history_data[self._s1_col]
         s2            = history_data[self._s2_col]
         spread_serie  = spread.construct_spread(s1,s2,self.b_ratio)
@@ -152,7 +152,9 @@ class OUpairTrader :
     
     def get_spread_price(self, date, history: pd.DataFrame) -> float:
         s1 = history[self._s1_col].iloc[-1]
+        s1 = s1 / history[self._s1_col].iloc[0]
         s2 = history[self._s2_col].iloc[-1]
+        s2 = s2 / history[self._s2_col].iloc[0]
         return float(s1 - self.b_ratio * s2)
 
 
