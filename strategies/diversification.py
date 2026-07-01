@@ -187,7 +187,8 @@ class MeanReversionRankingAllocator:
         if self.n == 1:
             self.capital_weights = pd.array([self.capital])
             return self.capital_weights
-
+        
+        self.l_tilde = self._min_max_normalize(self.likelihoods)
         products = [self.l_tilde[i] * self.mu_tilde[i] for i in range(self.n)]
 
         ranked_indices = np.argsort(products)
