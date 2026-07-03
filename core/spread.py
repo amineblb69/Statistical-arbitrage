@@ -6,8 +6,7 @@ def construct_spread(s1: pd.Series, s2: pd.Series, B: float):
     s1 = s1 / s1[0]
     s2 = s2 / s2[0]
     spread = s1 - B*s2
-
-
+    
     return spread
 
 def rolling_mean(spread , M):

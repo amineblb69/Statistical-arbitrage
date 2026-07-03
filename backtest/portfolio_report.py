@@ -367,10 +367,10 @@ def main():
 
         config = {
             "data": {
-                "formation_start": "2022-01-01",
-                "formation_end": "2022-12-31",
-                "trading_start": "2023-01-01",
-                "trading_end": "2023-12-31",
+                "formation_start": "2021-01-01",
+                "formation_end": "2021-12-31",
+                "trading_start": "2022-01-01",
+                "trading_end": "2022-12-31",
                 "interval": "1d",
             },
             "ou": {
@@ -381,8 +381,9 @@ def main():
                 "M": 30,
                 "K": 1.0,
                 "stop_loss_r": 0.1,
-                "slippage": 0.0005,
-                "commission": 0.001,
+                "slippage": 0.000,
+                "commission": 0.00,
+                "stop_loss_enabled": True,
             },
             "diversification": {
                 "rebalance_window": 63, 
@@ -392,7 +393,7 @@ def main():
 
         pairs = [["MS","GS"],["V","MA"],["WM","RSG"],["CVX","XOM"],["UAL","DAL"],["NVDA","AMD"]]
         initial_capital = 100_000.0
-
+    
         report = PortfolioReport(config, pairs, initial_capital)
         report.run()
         report.print_metrics()

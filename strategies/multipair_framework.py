@@ -8,7 +8,7 @@ from typing import Dict, List, Tuple, Union
 
 import strategies.diversification as _dv_module
 import strategies.pairs_trading as pt
-from backtest.engine import BacktestEngine
+from backtest.engine import BacktestEngine 
 
 
 class MultiPairFramework:
@@ -163,8 +163,8 @@ class MultiPairFramework:
         traders = {}
         for pair in self.pairs:
             df = self.price_history[pair].loc[:date]
-            if len(df) > self.L:
-                df = df.iloc[-self.L:]
+            if len(df) > self.Lr:
+                df = df.iloc[-self.Lr:]
             traders[pair] = self._fit_trader(df)
         self.pair_traders = traders
 
@@ -304,16 +304,22 @@ class MultiPairFramework:
             })
 
         # --- Portfolio-level snapshot ---
-        total_cap = sum(
-            self.pair_engines[p].capital for p in self.pairs if p in self.pair_engines
-        )
+        total_cap = 0.0
+        for p in self.pairs:
+            if p not in self.pair_engines:
+                continue
+            engine = self.pair_engines[p]
+            trader = self.pair_traders[p]
+            pair_hist = self.price_history[p].loc[:date]
+            spread_price = trader.get_spread_price(date, pair_hist)
+            total_cap += engine.mark_to_market(spread_price)
+
         self.portfolio_log.append({
             "date": date,
             "capital": total_cap,
             "stage": self.stage_idx,
             "stage_day": self.stage_day,
         })
-
         self.stage_day += 1
 
     # ------------------------------------------------------------------

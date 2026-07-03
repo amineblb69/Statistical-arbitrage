@@ -275,8 +275,8 @@ class MeanVarianceAllocator:
                 return 0.0 if num <= 0 else -1e12
             return -(num / den)
 
-        constraints = [{"type": "eq", "fun": lambda w: np.sum(w) - 1.0}]
-        bounds      = [(0.0, 1.0) for _ in range(self.n)]
+        bounds = [(-1.0, 1.0) for _ in range(self.n)]   # allow shorts
+        constraints = [{"type": "eq", "fun": lambda w: np.sum(np.abs(w)) - 1.0}]
         w0          = np.ones(self.n) / self.n
 
         result = minimize(

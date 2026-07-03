@@ -81,10 +81,13 @@ def fit_hedge_ratio(s1, s2, grid_min=-2, grid_max =2, grid_step = 0.01):
 
             mu, theta, sigma = compute_ou_params(spread)
 
-            if mu <= 0 or sigma <=0 :
+            if not np.isfinite(mu) or not np.isfinite(sigma) or sigma <= 0:
                 continue
+            mu_eff = max(mu, 1e-8)
 
             ll               = compute_log_likelihood(spread, mu, theta, sigma) 
+            if not np.isfinite(ll):
+                continue
 
             if ll > best_ll :
 
@@ -93,7 +96,7 @@ def fit_hedge_ratio(s1, s2, grid_min=-2, grid_max =2, grid_step = 0.01):
                 best_params = mu, theta, sigma 
 
         except Exception as e :
-            print("Problem fitting the hedge ratio b({b}): ",e)
+            print(f"Problem fitting the hedge ratio b({b}): ",e)
             
     mu_ , theta_, sigma_ = best_params
     

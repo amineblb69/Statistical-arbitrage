@@ -5,6 +5,7 @@ import pandas as pd
 
 class OUpairTrader :
     def __init__(self,config):
+        self.config = config
 
         trading = config["trading"]
         ou      = config["ou"]
@@ -104,15 +105,16 @@ class OUpairTrader :
 
                 self._position     = 1
                 self._entry_spread = current_s
-                self._spread_sl    = self._entry_spread - self.r * abs(self._entry_spread)
-
+                #self._spread_sl    = self._entry_spread - self.r * abs(self._entry_spread)
+                self._spread_sl    = self._entry_spread * (1 - self.r)
                 return 1
 
             elif current_s > upper :
 
                 self._position     = -1
                 self._entry_spread = current_s
-                self._spread_sl    = self._entry_spread + self.r *abs(self._entry_spread)
+                #self._spread_sl    = self._entry_spread + self.r *abs(self._entry_spread)
+                self._spread_sl    = self._entry_spread * (1 + self.r)
 
                 return -1
 
@@ -127,7 +129,8 @@ class OUpairTrader :
                 return 0
 
             # stop-loss: spread fell r% below entry  
-            if self._entry_spread is not None and current_s < self._spread_sl:
+            if self.config["trading"].get("stop_loss_enabled", True) and self._entry_spread is not None and current_s < self._spread_sl:
+
                 self._position    = 0
                 self._entry_spread = None
                 self._spread_sl    = None
@@ -142,7 +145,7 @@ class OUpairTrader :
                 return 0
 
             # stop-loss: spread rose r% above entry  
-            if self._entry_spread is not None and current_s > self._spread_sl:
+            if self.config["trading"].get("stop_loss_enabled", True) and self._entry_spread is not None and current_s > self._spread_sl:
                 self._position    = 0
                 self._entry_spread = None
                 self._spread_sl    = None

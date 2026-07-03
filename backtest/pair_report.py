@@ -306,9 +306,9 @@ def generate_report(results_df, trades_df, metrics, strategy, pair_id, initial_c
 def main():
     config = {
         "trading": {
-            "M": 63,
+            "M": 30,
             "K": 1.0,
-            "stop_loss_r": 0.01,
+            "stop_loss_r": 100.0,
             "slippage": 0.0005,
             "commission": 0.001,
         },
@@ -317,10 +317,10 @@ def main():
         }
     }
 
-    tickers = ["NVDA", "AMD"]
-    formation_start = "2015-01-01"
-    formation_end = "2016-01-01"
-    trading_end = "2026-01-01"
+    tickers = ["CVX", "XOM"]
+    formation_start = "2022-01-01"
+    formation_end = "2022-12-31"
+    trading_end = "2023-12-31"
     interval = "1d"
     initial_capital = 100_000.0
 
