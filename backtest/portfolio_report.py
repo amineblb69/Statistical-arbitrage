@@ -69,6 +69,7 @@ class PortfolioReport:
         self.portfolio_metrics  = None
         self.pair_metrics       = None
         self.pair_contributions = None
+        self.pair_trades        = None
 
     def _load_price_data(self) -> dict:
         price_data = {}
@@ -135,15 +136,13 @@ class PortfolioReport:
 
             self.pair_metrics       = {}
             self.pair_contributions = {}
+            self.pair_trades        = {}
 
             for pair in self.pairs :
 
                 engine = self.framework.pair_engines.get(pair)
-                trades_df = (
-                    pd.DataFrame(engine.trade_log)
-                    if engine is not None and engine.trade_log
-                    else pd.DataFrame()
-                )
+                trades_df = self.framework.get_pair_trades(pair)
+                self.pair_trades[pair] = trades_df
 
                 ref_capital = (
                     engine.initial_capital if engine is not None
@@ -151,10 +150,45 @@ class PortfolioReport:
                 )
 
                 self.pair_metrics[pair] = compute_metrics(trades_df, results_df=None,initial_capital=ref_capital)
-                
+
                 daily_log = self.pair_daily_logs.get(pair, pd.DataFrame())
                 self.pair_contributions[pair] = (
                 float(daily_log["pnl"].sum()) if not daily_log.empty else 0.0 )
+
+    def print_trade_logs(self, pair=None):
+        """
+        Print the detailed, trade-by-trade log (entry/exit spread, prices,
+        qty, pnl, costs) for one pair or all pairs.
+        """
+        if self.pair_trades is None:
+            raise RuntimeError("Call .run() before .print_trade_logs().")
+
+        pairs_to_print = [tuple(pair)] if pair is not None else self.pairs
+
+        cols = [
+            'entry_date', 'exit_date', 'side', 'qty',
+            's1_entry', 's2_entry', 's1_exit', 's2_exit',
+            'entry_spread', 'exit_spread',
+            's1_pnl', 's2_pnl', 'total_cost', 'net_pnl', 'return',
+        ]
+
+        pd.set_option('display.max_rows', None)
+        pd.set_option('display.width', 200)
+
+        for p in pairs_to_print:
+            trades_df = self.pair_trades.get(p, pd.DataFrame())
+            label = f"{p[0]}/{p[1]}"
+            print("\n" + "=" * 64)
+            print(f"TRADE LOG — {label}  ({len(trades_df)} trades)")
+            print("=" * 64)
+            if trades_df.empty:
+                print("  (no closed trades)")
+                continue
+            available_cols = [c for c in cols if c in trades_df.columns]
+            print(trades_df[available_cols].to_string(index=False))
+
+        pd.reset_option('display.max_rows')
+        pd.reset_option('display.width')
 
     def print_metrics(self):
         if self.portfolio_metrics is None:
@@ -378,9 +412,9 @@ def main():
                 "lookback_L": 252,
             },
             "trading": {
-                "M": 30,
-                "K": 1.0,
-                "stop_loss_r": 0.1,
+                "M": 63,
+                "K": 1.25,
+                "stop_loss_r": 0.01,
                 "slippage": 0.000,
                 "commission": 0.00,
                 "stop_loss_enabled": True,
@@ -397,6 +431,7 @@ def main():
         report = PortfolioReport(config, pairs, initial_capital)
         report.run()
         report.print_metrics()
+        report.print_trade_logs()
         report.generate_report(output_dir="reports")
         
 

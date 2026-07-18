@@ -25,6 +25,7 @@ from core.metrics import (
 from data.loader import fetch_pair_prices
 from strategies.pairs_trading import OUpairTrader
 from backtest.engine import BacktestEngine
+from core.spread import construct_spread
 
 
 def print_metrics(metrics):
@@ -166,9 +167,9 @@ def generate_report(results_df, trades_df, metrics, strategy, pair_id, initial_c
     ax_norm = fig.add_subplot(gs[2, 2])
     s1 = trading_data.iloc[:, 0]
     s2 = trading_data.iloc[:, 1]
-    s1_norm = s1 / s1.iloc[0] * 100
-    s2_norm = s2 / s2.iloc[0] * 100
-    strat_norm = results_df['capital'] / initial_capital * 100
+    s1_norm = s1 / s1.iloc[0] 
+    s2_norm = s2 / s2.iloc[0] 
+    strat_norm = results_df['capital'] / initial_capital
     ax_norm.plot(s1_norm.index, s1_norm, label=pair_id[0],
                  color='#E63946', linewidth=1.2)
     ax_norm.plot(s2_norm.index, s2_norm, label=pair_id[1],
@@ -182,7 +183,7 @@ def generate_report(results_df, trades_df, metrics, strategy, pair_id, initial_c
 
     # 6. Spread
     ax_spread = fig.add_subplot(gs[3, 0])
-    spread = s1 - strategy.b_ratio * s2
+    spread = construct_spread(s1,s2,strategy.b_ratio)
     ax_spread.plot(spread.index, spread, color='#6A4C93', linewidth=1)
     ax_spread.axhline(y=strategy.mu, color='orange', linestyle='--',
                       label=f"mu = {strategy.mu:.2f}")
@@ -306,7 +307,7 @@ def generate_report(results_df, trades_df, metrics, strategy, pair_id, initial_c
 def main():
     config = {
         "trading": {
-            "M": 30,
+            "M": 63,
             "K": 1.0,
             "stop_loss_r": 100.0,
             "slippage": 0.0005,
@@ -317,10 +318,10 @@ def main():
         }
     }
 
-    tickers = ["CVX", "XOM"]
-    formation_start = "2022-01-01"
-    formation_end = "2022-12-31"
-    trading_end = "2023-12-31"
+    tickers = ["MS", "GS"]
+    formation_start = "2021-01-01"
+    formation_end = "2021-12-31"
+    trading_end = "2022-12-31"
     interval = "1d"
     initial_capital = 100_000.0
 

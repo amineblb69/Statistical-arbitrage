@@ -60,12 +60,6 @@ class OUpairTrader :
         self._spread_sl    = None
 
 
-    def get_spread_price(self, date, history):
-        s1 = history.iloc[-1, 0]
-        s2 = history.iloc[-1, 1]
-        return s1 - self.b_ratio * s2
-
-    
     def generate_signals(self,date, history_data):
 
         """

@@ -130,16 +130,20 @@ class BacktestEngine:
 
             net_pnl = s1_pnl + s2_pnl - cost_s1 -cost_s2
 
+            prev_entry_spread = self.positions.get("entry_spread", spread)
+
             self.trade_log.append({
-                'pair'       : pair,
-                'side'       :'long_spread' if prev_signal == 1 else 'short_spread',
-                'entry_date' : prev_date,
-                'exit_date'  : date,
-                's1_entry'   : prev_s1_entry,
-                's2_entry'   : prev_s2_entry,
-                's1_exit'    : s1_exit,
-                's2_exit'    : s2_exit,
-                'qty'        : prev_qty,
+                'pair'         : pair,
+                'side'         :'long_spread' if prev_signal == 1 else 'short_spread',
+                'entry_date'   : prev_date,
+                'exit_date'    : date,
+                's1_entry'     : prev_s1_entry,
+                's2_entry'     : prev_s2_entry,
+                's1_exit'      : s1_exit,
+                's2_exit'      : s2_exit,
+                'entry_spread' : prev_entry_spread,
+                'exit_spread'  : spread,
+                'qty'          : prev_qty,
                 's1_pnl'     : s1_pnl,
                 's2_pnl'     : s2_pnl,
                 's1_cost'    : cost_s1,

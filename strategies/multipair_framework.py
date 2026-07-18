@@ -63,6 +63,9 @@ class MultiPairFramework:
 
         # Logs
         self.pair_daily_logs: Dict[Tuple[str, str], List[dict]] = {p: [] for p in self.pairs}
+        # Trade logs survive engine recreation at each rebalance (engines are
+        # rebuilt from scratch every stage, which used to wipe trade_log).
+        self.pair_trade_logs: Dict[Tuple[str, str], List[dict]] = {p: [] for p in self.pairs}
         self.portfolio_log: List[dict] = []
         self.stage_weights: List[np.ndarray] = []
 
@@ -172,8 +175,8 @@ class MultiPairFramework:
         def _live_fetch(pair):
             """Return only the last L days of history up to 'date'."""
             df = self.price_history[pair].loc[:date]
-            if len(df) > self.L:
-                df = df.iloc[-self.L:]
+            if len(df) > self.Lr:
+                df = df.iloc[-self.Lr:]
             return (df.iloc[:, 0].values, df.iloc[:, 1].values)
 
         _dv_module.fetch_pair_prices = _live_fetch
@@ -202,6 +205,10 @@ class MultiPairFramework:
 
         # --- 5. Create fresh engines with new capital ---
         for i, pair in enumerate(self.pairs):
+            old_engine = self.pair_engines.get(pair)
+            if old_engine is not None and old_engine.trade_log:
+                self.pair_trade_logs[pair].extend(old_engine.trade_log)
+
             self.pair_capital[pair] = allocations[i]
             self.pair_engines[pair] = BacktestEngine(
                 initial_capital=allocations[i],
@@ -366,6 +373,15 @@ class MultiPairFramework:
 
     def get_pair_curve(self, pair: Tuple[str, str]) -> pd.DataFrame:
         return pd.DataFrame(self.pair_daily_logs.get(pair, []))
+
+    def get_pair_trades(self, pair: Tuple[str, str]) -> pd.DataFrame:
+        """Full trade history for a pair across ALL stages (closed trades
+        from past rebalances + any trades already closed by the still-live
+        engine of the current stage)."""
+        closed_past = self.pair_trade_logs.get(pair, [])
+        engine = self.pair_engines.get(pair)
+        live = engine.trade_log if engine is not None else []
+        return pd.DataFrame(closed_past + live)
 
     def get_weights_table(self) -> pd.DataFrame:
         return pd.DataFrame(
