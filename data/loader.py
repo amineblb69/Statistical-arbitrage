@@ -7,7 +7,7 @@ os.makedirs(CACHE_DIR, exist_ok=True)
 
 def fetch_pair_prices(tickers : list, start, end, itv : str):
 
-    """ Fetch and clean stock data from yfinance. """
+    """ Fetch and clean pair stock data from yfinance. """
 
     df = pd.DataFrame()
 
