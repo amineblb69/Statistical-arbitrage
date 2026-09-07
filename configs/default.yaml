@@ -42,3 +42,19 @@ rl:
   epsilon: 0.1
   n_episodes: 10
   n_train_paths: 10000
+
+ou:
+  hedge_ratio_grid: [-2.0, 2.0, 0.01]
+
+sot:
+  N: 3                    # signature truncation level
+  k: 1.0                  # stopping threshold (Eq. 3.18)
+  mu_sig: 20.0            # sigmoid sharpness (paper: 20)
+  n_train_paths: 100      # M in Eq. 3.19
+  horizon_days: 252       # trading period length in days
+  r_entry: 0.0            # discount rate for entry payoff
+  r_exit: 0.0             # discount rate for exit payoff
+  c_entry: 0.0            # transaction cost c
+  c_exit: 0.0             # transaction cost ĉ
+  min_watch_days: 3       # cool-off bars after each refit
+  seed: 0

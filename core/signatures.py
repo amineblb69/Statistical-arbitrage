@@ -17,7 +17,7 @@ def segment_signature(self, delta):
 def tensor_mult(a: dict, b: dict, N: int) -> dict:
     """
     Concatenation product Sig(A) ⊗ Sig(B), truncated at level N (fact F2).
-        out[m] = Σ_{k=0..m}  a[k] ⊗ b[m-k]
+        out[m] = Σ_{k=0..m}  a[k] ⊗ b[m-k]  
     """
     out = {}
     for m in range(N + 1):
