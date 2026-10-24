@@ -99,16 +99,16 @@ class OUpairTrader :
 
                 self._position     = 1
                 self._entry_spread = current_s
-                #self._spread_sl    = self._entry_spread - self.r * abs(self._entry_spread)
-                self._spread_sl    = self._entry_spread * (1 - self.r)
+                self._spread_sl    = self._entry_spread - self.r * abs(self._entry_spread)
+                #self._spread_sl    = self._entry_spread * (1 - self.r) FALSE when spread < 0 
                 return 1
 
             elif current_s > upper :
 
                 self._position     = -1
                 self._entry_spread = current_s
-                #self._spread_sl    = self._entry_spread + self.r *abs(self._entry_spread)
-                self._spread_sl    = self._entry_spread * (1 + self.r)
+                self._spread_sl    = self._entry_spread + self.r *abs(self._entry_spread)
+                #self._spread_sl    = self._entry_spread * (1 + self.r) FALSE when spread < 0
 
                 return -1
 
